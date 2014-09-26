@@ -1,0 +1,22 @@
+package org.allenai.dependencies.graphmatch.compositegraph
+
+/**
+ */
+case class PathPair(val questionPath : PathTrait, val evidencePath : PathTrait) {
+
+  val (heads, tails) = (questionPath,evidencePath) match {
+    case (qp : NodePath, ep : NodePath) => ((qp.inNode,ep.inNode),(qp.outNode,ep.outNode))
+    case (qp : EdgePath, ep : EdgePath) => ((qp.inEdge,ep.inEdge),(qp.outEdge,ep.outEdge))
+    case (qp : NullNodePath, ep : Any) => ((null,null),(null,null)) // Go on, use options
+    case (qp : NullEdgePath, ep : Any) => ((null,null),(null,null))
+    case _ => throw new Exception(s"Unknown path type for either or both of $questionPath, $evidencePath")
+  }
+
+  override def toString : String = {
+    (questionPath,evidencePath) match {
+      case (qe : NodePath, ee : NodePath) => s"${qe.toString}::${ee.toString}-${(qe.inNode.getProperty("position") : Int) + 1}"
+      case (qe : EdgePath, ee : EdgePath) => s"<${qe.toString}::${ee.toString}>"
+      case _ => throw new Exception(s"Unallowed path heads $questionPath, $evidencePath")
+    }
+  }
+}
